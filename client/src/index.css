@@ -231,6 +231,25 @@ button, input { font-family: inherit; }
   box-shadow: 0 3px 8px rgba(59, 78, 255, .35);
 }
 
+/* ---------- comment thread ---------- */
+.thread-label {
+  display: block; font-size: 12px; font-weight: 800; color: var(--ink-soft);
+  margin-bottom: 8px; text-transform: uppercase; letter-spacing: .04em;
+}
+.thread-list { max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+.thread-empty { font-size: 13px; color: var(--ink-soft); }
+.thread-item { border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.thread-item-head { display: flex; align-items: center; justify-content: space-between; }
+.thread-author { font-size: 12px; font-weight: 800; color: var(--ink); }
+.thread-delete { border: none; background: none; color: var(--ink-soft); font-size: 11px; font-weight: 800; cursor: pointer; }
+.thread-text { font-size: 13px; color: var(--ink); margin-top: 2px; }
+.thread-form { display: flex; gap: 8px; }
+.thread-form input {
+  flex: 1; border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px;
+  font-size: 13px; color: var(--ink); background: var(--surface);
+}
+.thread-form input:focus { outline: none; border-color: var(--sel-ring); }
+
 /* ---------- modal ---------- */
 .modal-backdrop {
   position: fixed; inset: 0; background: rgba(29, 20, 64, .45);

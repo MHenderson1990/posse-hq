@@ -1,7 +1,11 @@
 import RSVPBar from './RSVPBar';
 
-export default function EventCard({ event, category, rsvps = [], currentUserId, onSetStatus, onEdit }) {
-  let meta = [event.dayLabel ? `Day ${event.dayLabel}` : event.startTime, event.location]
+export default function EventCard({ event, category, rsvps = [], currentUserId, onSetStatus, onEdit, commentCount }) {
+  let meta = [
+    event.dayLabel ? `Day ${event.dayLabel}` : event.startTime,
+    event.location,
+    commentCount ? `💬 ${commentCount}` : null,
+  ]
     .filter(Boolean)
     .join(' · ');
 

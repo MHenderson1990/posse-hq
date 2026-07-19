@@ -1,5 +1,6 @@
 let express = require('express');
 let Event = require('../models/Event');
+let { notifyGroup } = require('../services/push');
 
 let router = express.Router({ mergeParams: true });
 
@@ -29,6 +30,14 @@ router.post('/', async (req, res) => {
     description,
     createdBy: req.userId,
   });
+
+  notifyGroup(req.params.groupId, {
+    type: 'event_created',
+    excludeUserId: req.userId,
+    title: 'New event',
+    body: `${event.title} — ${event.startDate}`,
+  });
+
   res.status(201).json({ event });
 });
 

@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { createEvent, updateEvent, deleteEvent } from '../api/events';
+import { useAuth } from '../context/AuthContext';
+import CommentThread from './CommentThread';
 
-export default function EventForm({ groupId, categories, initialEvent, defaultDate, onSaved, onDeleted, onCancel }) {
+export default function EventForm({ groupId, categories, initialEvent, defaultDate, onSaved, onDeleted, onCancel, onCommentCountChange }) {
+  let { user } = useAuth();
   let editing = Boolean(initialEvent);
   let [title, setTitle] = useState(initialEvent?.title || '');
   let [categoryId, setCategoryId] = useState(initialEvent?.categoryId || categories[0]?._id || '');
@@ -109,6 +112,16 @@ export default function EventForm({ groupId, categories, initialEvent, defaultDa
             </button>
           )}
         </form>
+        {editing && (
+          <div style={{ padding: '0 24px 22px' }}>
+            <CommentThread
+              groupId={groupId}
+              eventId={initialEvent._id}
+              currentUserId={user.id}
+              onCountChange={(count) => onCommentCountChange?.(initialEvent._id, count)}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

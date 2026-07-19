@@ -6,6 +6,7 @@ import { useTheme } from '../context/ThemeContext';
 import { listCategories } from '../api/categories';
 import { listEvents } from '../api/events';
 import { listRsvps, setMyRsvp } from '../api/rsvps';
+import { listComments } from '../api/comments';
 import { getMonthWeeks, monthLabel, isoDateToday, formatLongDate, eventsForDay } from '../utils/calendar';
 import CalendarGrid from '../components/CalendarGrid';
 import EventCard from '../components/EventCard';
@@ -25,6 +26,7 @@ export default function Calendar() {
   let [categories, setCategories] = useState([]);
   let [events, setEvents] = useState([]);
   let [rsvpsByEvent, setRsvpsByEvent] = useState({});
+  let [commentCounts, setCommentCounts] = useState({});
   let [formState, setFormState] = useState(null); // null | 'new' | eventObject
 
   useEffect(() => {
@@ -50,6 +52,8 @@ export default function Calendar() {
     if (!ids.length) return;
     Promise.all(ids.map((id) => listRsvps(group._id, id).then((data) => [id, data.rsvps])))
       .then((pairs) => setRsvpsByEvent((prev) => ({ ...prev, ...Object.fromEntries(pairs) })));
+    Promise.all(ids.map((id) => listComments(group._id, id).then((data) => [id, data.comments.length])))
+      .then((pairs) => setCommentCounts((prev) => ({ ...prev, ...Object.fromEntries(pairs) })));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedIso, events, group._id]);
 
@@ -89,6 +93,10 @@ export default function Calendar() {
       let others = existing.filter((r) => r.userId._id !== user.id);
       return { ...prev, [eventId]: [...others, data.rsvp] };
     });
+  }
+
+  function handleCommentCountChange(eventId, count) {
+    setCommentCounts((prev) => ({ ...prev, [eventId]: count }));
   }
 
   return (
@@ -146,6 +154,7 @@ export default function Calendar() {
                 currentUserId={user.id}
                 onSetStatus={(status) => handleSetRsvp(e._id, status)}
                 onEdit={() => setFormState(events.find((full) => full._id === e._id))}
+                commentCount={commentCounts[e._id]}
               />
             ))
           )}
@@ -166,6 +175,7 @@ export default function Calendar() {
           onSaved={handleSaved}
           onDeleted={handleDeleted}
           onCancel={() => setFormState(null)}
+          onCommentCountChange={handleCommentCountChange}
         />
       )}
     </div>
