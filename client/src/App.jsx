@@ -9,6 +9,7 @@ import Register from './pages/Register';
 import Group from './pages/Group';
 import Settings from './pages/Settings';
 import Calendar from './pages/Calendar';
+import Polls from './pages/Polls';
 
 export default function App() {
   return (
@@ -32,6 +33,16 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <Settings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/polls"
+                element={
+                  <ProtectedRoute>
+                    <RequireGroup>
+                      <Polls />
+                    </RequireGroup>
                   </ProtectedRoute>
                 }
               />

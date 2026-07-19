@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createEvent, updateEvent, deleteEvent } from '../api/events';
 import { useAuth } from '../context/AuthContext';
 import CommentThread from './CommentThread';
+import BringList from './BringList';
 
 export default function EventForm({ groupId, categories, initialEvent, defaultDate, onSaved, onDeleted, onCancel, onCommentCountChange }) {
   let { user } = useAuth();
@@ -14,19 +15,31 @@ export default function EventForm({ groupId, categories, initialEvent, defaultDa
   let [endTime, setEndTime] = useState(initialEvent?.endTime || '');
   let [location, setLocation] = useState(initialEvent?.location || '');
   let [description, setDescription] = useState(initialEvent?.description || '');
+  let [repeat, setRepeat] = useState('none');
   let [error, setError] = useState('');
   let [submitting, setSubmitting] = useState(false);
+
+  function handleRepeatChange(value) {
+    setRepeat(value);
+    if (value !== 'none') setEndDate(startDate);
+  }
+
+  function handleStartDateChange(value) {
+    setStartDate(value);
+    if (repeat !== 'none') setEndDate(value);
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     setSubmitting(true);
     let payload = { title, categoryId, startDate, endDate, startTime, endTime, location, description };
+    if (!editing && repeat !== 'none') payload.recurrenceRule = { freq: repeat };
     try {
       let data = editing
         ? await updateEvent(groupId, initialEvent._id, payload)
         : await createEvent(groupId, payload);
-      onSaved(data.event);
+      onSaved(data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -67,11 +80,18 @@ export default function EventForm({ groupId, categories, initialEvent, defaultDa
           <div style={{ display: 'flex', gap: 10 }}>
             <div className="field" style={{ flex: 1 }}>
               <label htmlFor="ev-start-date">Start date</label>
-              <input id="ev-start-date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
+              <input id="ev-start-date" type="date" value={startDate} onChange={(e) => handleStartDateChange(e.target.value)} required />
             </div>
             <div className="field" style={{ flex: 1 }}>
               <label htmlFor="ev-end-date">End date</label>
-              <input id="ev-end-date" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} required />
+              <input
+                id="ev-end-date"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                disabled={repeat !== 'none'}
+                required
+              />
             </div>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
@@ -92,6 +112,17 @@ export default function EventForm({ groupId, categories, initialEvent, defaultDa
             <label htmlFor="ev-description">Description</label>
             <textarea id="ev-description" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
           </div>
+          {!editing && (
+            <div className="field">
+              <label htmlFor="ev-repeat">Repeat</label>
+              <select id="ev-repeat" value={repeat} onChange={(e) => handleRepeatChange(e.target.value)}>
+                <option value="none">Doesn't repeat</option>
+                <option value="weekly">Weekly</option>
+                <option value="biweekly">Every other week</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+          )}
           {error && <div className="error-text">{error}</div>}
           <div style={{ display: 'flex', gap: 10 }}>
             <button className="btn-primary" type="submit" disabled={submitting} style={{ flex: 1 }}>
@@ -113,13 +144,14 @@ export default function EventForm({ groupId, categories, initialEvent, defaultDa
           )}
         </form>
         {editing && (
-          <div style={{ padding: '0 24px 22px' }}>
+          <div style={{ padding: '0 24px 22px', display: 'flex', flexDirection: 'column', gap: 20 }}>
             <CommentThread
               groupId={groupId}
               eventId={initialEvent._id}
               currentUserId={user.id}
               onCountChange={(count) => onCommentCountChange?.(initialEvent._id, count)}
             />
+            <BringList groupId={groupId} eventId={initialEvent._id} currentUserId={user.id} />
           </div>
         )}
       </div>

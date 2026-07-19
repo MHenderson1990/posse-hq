@@ -250,6 +250,18 @@ button, input { font-family: inherit; }
 }
 .thread-form input:focus { outline: none; border-color: var(--sel-ring); }
 
+/* ---------- bring list ---------- */
+.bring-item { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.bring-check {
+  width: 20px; height: 20px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface);
+  color: #fff; font-size: 12px; font-weight: 900; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.bring-check.checked { background: var(--g-main); border-color: transparent; }
+.bring-label { font-size: 13px; font-weight: 700; color: var(--ink); }
+.bring-label.claimed { color: var(--ink-soft); text-decoration: line-through; }
+.bring-by { font-size: 11px; color: var(--ink-soft); margin-top: 1px; }
+
 /* ---------- modal ---------- */
 .modal-backdrop {
   position: fixed; inset: 0; background: rgba(29, 20, 64, .45);

@@ -73,11 +73,16 @@ export default function Calendar() {
     setSelectedIso(today);
   }
 
-  function handleSaved(event) {
-    setEvents((prev) => {
-      let exists = prev.some((e) => e._id === event._id);
-      return exists ? prev.map((e) => (e._id === event._id ? event : e)) : [...prev, event];
-    });
+  function handleSaved(data) {
+    if (data.occurrences) {
+      setEvents((prev) => [...prev, ...data.occurrences]);
+    } else {
+      let event = data.event;
+      setEvents((prev) => {
+        let exists = prev.some((e) => e._id === event._id);
+        return exists ? prev.map((e) => (e._id === event._id ? event : e)) : [...prev, event];
+      });
+    }
     setFormState(null);
   }
 
@@ -162,6 +167,7 @@ export default function Calendar() {
 
         <div style={{ display: 'flex', gap: 10, padding: '0 18px 18px' }}>
           <Link className="btn-secondary" to="/group">Group</Link>
+          <Link className="btn-secondary" to="/polls">Polls</Link>
           <Link className="btn-secondary" to="/settings">Settings</Link>
         </div>
       </div>
