@@ -172,8 +172,9 @@ button, input { font-family: inherit; }
 .grid { padding: 0 6px; }
 .week { position: relative; display: grid; grid-template-columns: repeat(7, 1fr); }
 .cell {
-  min-height: 86px; border-top: 1px solid var(--line);
+  min-height: 86px; min-width: 0; border-top: 1px solid var(--line);
   padding: 3px 2px 2px; cursor: pointer; border-radius: 8px; transition: background .12s;
+  overflow: hidden;
 }
 .cell:hover { background: var(--cellbg-hover); }
 .cell.selected { background: var(--cellbg-selected); box-shadow: inset 0 0 0 2px var(--sel-ring); }
