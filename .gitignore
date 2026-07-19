@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.*
+!.env.example
+dist/
+client/dist/
+client/ios/
+www/
+.DS_Store
+*.log

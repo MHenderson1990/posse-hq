@@ -1,0 +1,249 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
+
+:root {
+  --surface: #FFFFFF;
+  --bg: #EAE7F5;
+  --cellbg-hover: #F7F6FE;
+  --cellbg-selected: #F1EEFF;
+  --sel-ring: #B9AFFF;
+  --ink: #1D1440;
+  --ink-soft: #7A72A0;
+  --line: #EFEAFB;
+  --dim: #CFC8E6;
+  --detail-divider: #F1EEFF;
+  --card-shadow: 0 3px 10px rgba(29, 20, 64, .06);
+  --g-main: linear-gradient(105deg, #3B4EFF 0%, #6C3DF4 55%, #9D4EDD 100%);
+  --g-today: linear-gradient(135deg, #3B4EFF 0%, #9D4EDD 100%);
+  --trip: #0496FF;
+  --food: #FF9F1C;
+  --chill: #8B5CF6;
+  --party: #FF2E7E;
+  --error: #E0245E;
+}
+
+[data-theme="dark"] {
+  --surface: #15121F;
+  --bg: #0D0B16;
+  --cellbg-hover: #1D1930;
+  --cellbg-selected: #241E3E;
+  --sel-ring: #5F4BC2;
+  --ink: #EDEBFA;
+  --ink-soft: #9A93BF;
+  --line: #26213C;
+  --dim: #4A4468;
+  --detail-divider: #1D1930;
+  --card-shadow: 0 3px 10px rgba(0, 0, 0, .35);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  min-height: 100vh;
+  transition: background .2s, color .2s;
+}
+
+#root { min-height: 100vh; }
+
+h1, h2, h3, .heading {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+}
+
+button, input { font-family: inherit; }
+
+.page-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.btn-primary {
+  border: none;
+  background: var(--g-main);
+  color: #fff;
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(59, 78, 255, .35);
+}
+.btn-primary:disabled { opacity: .6; cursor: default; }
+
+.btn-secondary {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface);
+  border-radius: 24px;
+  box-shadow: 0 26px 70px rgba(29, 20, 64, .18);
+  overflow: hidden;
+}
+
+.auth-card .header .tag { opacity: .85; font-size: 13px; margin-top: 2px; }
+
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--ink-soft);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.field input, .field select, .field textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface);
+}
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--sel-ring); }
+.field textarea { resize: vertical; }
+
+.error-text { color: var(--error); font-size: 13px; font-weight: 700; }
+
+.switch-link { text-align: center; font-size: 13px; color: var(--ink-soft); }
+.switch-link a { color: #6C3DF4; font-weight: 800; text-decoration: none; }
+
+/* ---------- calendar ---------- */
+.calendar-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 32px 16px 64px;
+}
+
+.calendar-card {
+  width: 100%;
+  max-width: 430px;
+  height: fit-content;
+  background: var(--surface);
+  border-radius: 32px;
+  box-shadow: 0 26px 70px rgba(29, 20, 64, .22);
+  overflow: hidden;
+}
+
+.app-header { background: var(--g-main); padding: 22px 18px 14px; color: #fff; }
+.app-header .row { display: flex; align-items: center; justify-content: space-between; }
+.month-name { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 27px; letter-spacing: -.01em; }
+.month-name span { opacity: .72; font-weight: 700; }
+.controls { display: flex; gap: 6px; align-items: center; }
+.controls button {
+  border: none; background: rgba(255, 255, 255, .22); color: #fff; border-radius: 10px;
+  padding: 6px 10px; font-size: 13px; font-weight: 800; cursor: pointer;
+}
+.legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.chip { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; color: #fff; }
+.dot { width: 9px; height: 9px; border-radius: 3px; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); }
+
+.dow {
+  display: grid; grid-template-columns: repeat(7, 1fr); padding: 8px 6px 0;
+  font-size: 10px; font-weight: 800; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em;
+}
+.dow div { text-align: center; padding: 4px 0; }
+.grid { padding: 0 6px; }
+.week { position: relative; display: grid; grid-template-columns: repeat(7, 1fr); }
+.cell {
+  min-height: 86px; border-top: 1px solid var(--line);
+  padding: 3px 2px 2px; cursor: pointer; border-radius: 8px; transition: background .12s;
+}
+.cell:hover { background: var(--cellbg-hover); }
+.cell.selected { background: var(--cellbg-selected); box-shadow: inset 0 0 0 2px var(--sel-ring); }
+.datenum { font-size: 12px; font-weight: 800; text-align: right; padding: 2px 5px 3px; color: var(--ink); }
+.cell.dim .datenum { color: var(--dim); }
+.cell.today .datenum { padding: 0; }
+.cell.today .datenum b {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%; background: var(--g-today); color: #fff;
+  font-size: 12px; margin: 1px 2px 2px 0; box-shadow: 0 2px 6px rgba(59, 78, 255, .45);
+}
+.ev {
+  font-size: 9px; font-weight: 800; line-height: 1.25;
+  border-radius: 4px; padding: 2px 3px; margin: 1px 1px 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;
+}
+.more { font-size: 9px; font-weight: 900; color: var(--ink-soft); padding: 1px 3px; }
+.bar {
+  position: absolute; top: 26px; height: 15px; border-radius: 5px;
+  font-size: 9px; font-weight: 800; color: #fff; line-height: 15px;
+  padding: 0 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  pointer-events: none; box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+}
+.bar.cont-left { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.bar.cont-right { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.week.has-lane .ev-stack { padding-top: 17px; }
+
+.detail { border-top: 6px solid var(--detail-divider); padding: 14px 18px 22px; }
+.detail h3 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 15px; color: var(--ink); }
+.card {
+  display: flex; gap: 10px; border: 1px solid var(--line); border-radius: 16px;
+  padding: 12px; margin-bottom: 9px; align-items: flex-start;
+  box-shadow: var(--card-shadow); background: var(--surface);
+}
+.stripe { width: 6px; align-self: stretch; border-radius: 4px; flex-shrink: 0; }
+.card .t { font-weight: 800; font-size: 14px; color: var(--ink); }
+.card .m { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+
+.rsvp { display: flex; flex-direction: column; gap: 8px; margin-top: 9px; }
+.rsvp-top { display: flex; align-items: center; gap: 8px; }
+.faces { display: flex; }
+.face {
+  width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--surface); margin-left: -6px;
+  font-size: 10px; font-weight: 800; color: #fff; display: flex; align-items: center; justify-content: center;
+}
+.face:first-child { margin-left: 0; }
+.going { font-size: 11px; font-weight: 800; color: var(--ink-soft); }
+.rsvp-actions { display: flex; gap: 6px; }
+.rsvp-pill {
+  flex: 1; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  border-radius: 999px; padding: 6px 4px; font-size: 11px; font-weight: 900; cursor: pointer; text-align: center;
+}
+.rsvp-pill.active {
+  background: var(--g-main); color: #fff; border-color: transparent;
+  box-shadow: 0 3px 8px rgba(59, 78, 255, .35);
+}
+
+/* ---------- modal ---------- */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(29, 20, 64, .45);
+  display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 100;
+}
+.modal-card {
+  width: 100%; max-width: 380px; max-height: 90vh; overflow-y: auto;
+  background: var(--surface); border-radius: 24px; box-shadow: 0 26px 70px rgba(29, 20, 64, .3);
+}
+.modal-card .header, .auth-card .header {
+  background: var(--g-main); padding: 22px 24px; color: #fff;
+}
+.modal-card .header .brand, .auth-card .header .brand { font-size: 20px; }
+.modal-card > form, .auth-card > form {
+  padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 14px;
+}

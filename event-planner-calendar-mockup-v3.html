@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Planner — Middle Ground + Theme Toggle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  /* ---------- theme tokens ---------- */
+  .phone{
+    --surface:#FFFFFF;
+    --cellbg-hover:#F7F6FE;
+    --cellbg-selected:#F1EEFF;
+    --sel-ring:#B9AFFF;
+    --ink:#1D1440;
+    --ink-soft:#7A72A0;
+    --line:#EFEAFB;
+    --dim:#CFC8E6;
+    --detail-divider:#F1EEFF;
+    --card-shadow:0 3px 10px rgba(29,20,64,.06);
+    /* blueish-purple gradient family */
+    --g-main: linear-gradient(105deg,#3B4EFF 0%,#6C3DF4 55%,#9D4EDD 100%);
+    --g-today: linear-gradient(135deg,#3B4EFF 0%,#9D4EDD 100%);
+    /* flat category colors */
+    --trip:#0496FF;
+    --food:#FF9F1C;
+    --chill:#8B5CF6;
+    --party:#FF2E7E;
+    --activity:#2EC4B6;
+  }
+  .phone[data-theme="dark"]{
+    --surface:#15121F;
+    --cellbg-hover:#1D1930;
+    --cellbg-selected:#241E3E;
+    --sel-ring:#5F4BC2;
+    --ink:#EDEBFA;
+    --ink-soft:#9A93BF;
+    --line:#26213C;
+    --dim:#4A4468;
+    --detail-divider:#1D1930;
+    --card-shadow:0 3px 10px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:#EAE7F5;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    display:flex;flex-direction:column;align-items:center;
+    padding:32px 16px 64px;min-height:100vh;
+  }
+  .page-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:#1D1440;margin-bottom:4px}
+  .page-sub{color:#7A72A0;font-size:14px;margin-bottom:24px;text-align:center;max-width:440px}
+
+  .phone{
+    width:390px;background:var(--surface);border-radius:36px;
+    box-shadow:0 26px 70px rgba(29,20,64,.28);
+    overflow:hidden;transition:background .25s;
+  }
+  .app-header{background:var(--g-main);padding:22px 18px 14px;color:#fff}
+  .app-header .row{display:flex;align-items:center;justify-content:space-between}
+  .month-name{font-family:'Nunito',sans-serif;font-weight:900;font-size:27px;letter-spacing:-.01em}
+  .month-name span{opacity:.72;font-weight:700}
+  .controls{display:flex;gap:6px;align-items:center}
+  .controls button{
+    border:none;background:rgba(255,255,255,.22);color:#fff;border-radius:10px;
+    padding:6px 10px;font-size:13px;font-weight:800;cursor:pointer;
+  }
+  #theme-toggle{font-size:14px;padding:6px 9px}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .chip{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:#fff}
+  .dot{width:9px;height:9px;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+
+  .dow{display:grid;grid-template-columns:repeat(7,1fr);padding:8px 6px 0;
+       font-size:10px;font-weight:800;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em}
+  .dow div{text-align:center;padding:4px 0}
+  .grid{padding:0 6px}
+  .week{position:relative;display:grid;grid-template-columns:repeat(7,1fr)}
+  .cell{
+    min-height:86px;border-top:1px solid var(--line);
+    padding:3px 2px 2px;cursor:pointer;border-radius:8px;transition:background .12s;
+  }
+  .cell:hover{background:var(--cellbg-hover)}
+  .cell.selected{background:var(--cellbg-selected);box-shadow:inset 0 0 0 2px var(--sel-ring)}
+  .datenum{font-size:12px;font-weight:800;text-align:right;padding:2px 5px 3px;color:var(--ink)}
+  .cell.dim .datenum{color:var(--dim)}
+  .cell.today .datenum{padding:0}
+  .cell.today .datenum b{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:22px;height:22px;border-radius:50%;background:var(--g-today);color:#fff;
+    font-size:12px;margin:1px 2px 2px 0;box-shadow:0 2px 6px rgba(59,78,255,.45);
+  }
+  /* flat slivers */
+  .ev{
+    font-size:9px;font-weight:800;line-height:1.25;
+    border-radius:4px;padding:2px 3px;margin:1px 1px 0;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;
+  }
+  .more{font-size:9px;font-weight:900;color:var(--ink-soft);padding:1px 3px}
+  /* gradient spanning bars */
+  .bar{
+    position:absolute;top:26px;height:15px;border-radius:5px;
+    font-size:9px;font-weight:800;color:#fff;line-height:15px;
+    padding:0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    pointer-events:none;box-shadow:0 2px 5px rgba(0,0,0,.2);
+  }
+  .bar.cont-left{border-top-left-radius:0;border-bottom-left-radius:0}
+  .bar.cont-right{border-top-right-radius:0;border-bottom-right-radius:0}
+  .week.has-lane .ev-stack{padding-top:17px}
+
+  .detail{border-top:6px solid var(--detail-divider);padding:14px 18px 22px}
+  .detail h3{font-family:'Nunito',sans-serif;font-weight:900;font-size:15px;margin-bottom:10px;color:var(--ink)}
+  .card{
+    display:flex;gap:10px;border:1px solid var(--line);border-radius:16px;
+    padding:12px;margin-bottom:9px;align-items:flex-start;
+    box-shadow:var(--card-shadow);background:var(--surface);
+  }
+  .stripe{width:6px;align-self:stretch;border-radius:4px;flex-shrink:0}
+  .card .t{font-weight:800;font-size:14px;color:var(--ink)}
+  .card .m{font-size:12px;color:var(--ink-soft);margin-top:2px}
+  .rsvp{display:flex;align-items:center;gap:8px;margin-top:9px}
+  .faces{display:flex}
+  .face{
+    width:22px;height:22px;border-radius:50%;border:2px solid var(--surface);margin-left:-6px;
+    font-size:10px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;
+  }
+  .face:first-child{margin-left:0}
+  .going{font-size:11px;font-weight:800;color:var(--ink-soft)}
+  .pill{
+    margin-left:auto;font-size:11px;font-weight:900;border:none;border-radius:999px;
+    padding:6px 13px;background:var(--g-main);color:#fff;cursor:default;
+    box-shadow:0 3px 8px rgba(59,78,255,.35);
+  }
+  .note{max-width:440px;margin-top:26px;font-size:13px;color:#7A72A0;line-height:1.55}
+  .note b{color:#1D1440}
+</style>
+</head>
+<body>
+
+<div class="page-title">Middle ground · blue-purple · theme toggle</div>
+<div class="page-sub">Gradients live on the header, spanning bars, today marker, and buttons. Grid slivers are flat. Hit the 🌙 in the header to flip themes.</div>
+
+<div class="phone" id="phone" data-theme="light">
+  <div class="app-header">
+    <div class="row">
+      <div class="month-name">July <span>2026</span></div>
+      <div class="controls">
+        <button>‹</button><button>Today</button><button>›</button>
+        <button id="theme-toggle" title="Toggle theme">🌙</button>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="chip"><span class="dot" style="background:#0496FF"></span>Trips</div>
+      <div class="chip"><span class="dot" style="background:#FF9F1C"></span>Food</div>
+      <div class="chip"><span class="dot" style="background:#8B5CF6"></span>Games &amp; Chill</div>
+      <div class="chip"><span class="dot" style="background:#FF2E7E"></span>Parties</div>
+      <div class="chip"><span class="dot" style="background:#2EC4B6"></span>Activities</div>
+    </div>
+  </div>
+
+  <div class="dow"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
+  <div class="grid" id="grid"></div>
+
+  <div class="detail">
+    <h3 id="detail-title">Sunday, July 19</h3>
+    <div id="detail-body"></div>
+  </div>
+</div>
+
+<div class="note">
+  <b>Notes:</b> spanning bars are category-colored (blue for Trips here), matching the
+  grid slivers — the blue-purple gradient is reserved for the header, today marker, and
+  buttons. Dark mode keeps the same flat category colors, which pop harder on the dark
+  surface.
+</div>
+
+<script>
+  let CAT = {
+    trip:     {color:'#0496FF'},
+    food:     {color:'#FF9F1C'},
+    chill:    {color:'#8B5CF6'},
+    party:    {color:'#FF2E7E'},
+    activity: {color:'#2EC4B6'}
+  };
+  let SPANS = [
+    {title:'Lake Trip 🚤', cat:'trip', start:3, end:5},
+    {title:'Hurricane Harbor 🎢', cat:'trip', start:25, end:26}
+  ];
+  let EVENTS = {
+    7:  [{t:'Taco Tuesday', cat:'food', time:'7:00 PM', loc:"Torchy's on Greenville", going:5, maybe:1, comments:3}],
+    10: [{t:'Game Night', cat:'chill', time:'8:00 PM', loc:"Mo's place", going:6, maybe:0, comments:8}],
+    14: [{t:'Open Mic', cat:'party', time:'9:00 PM', loc:'Deep Ellum', going:3, maybe:2, comments:2}],
+    17: [{t:'Movie Night', cat:'chill', time:'7:30 PM', loc:'AMC Firewheel', going:4, maybe:1, comments:5},
+         {t:'Late Bites', cat:'food', time:'10:30 PM', loc:'Whataburger run', going:4, maybe:0, comments:1}],
+    19: [{t:'Sunday Brunch', cat:'food', time:'11:30 AM', loc:'Snooze, Lower Greenville', going:4, maybe:2, comments:6}],
+    24: [{t:"Lucki's 31st 🎂", cat:'party', time:'8:00 PM', loc:'TBD — vote in thread', going:7, maybe:1, comments:12}],
+    28: [{t:'Game Night', cat:'chill', time:'8:00 PM', loc:"Dre's place", going:5, maybe:1, comments:4}],
+    31: [{t:'Karaoke 🎤', cat:'party', time:'9:00 PM', loc:'Spirits KTV', going:6, maybe:2, comments:7}]
+  };
+  let WEEKS = [
+    [ {d:28},{d:29},{d:30},{d:1,july:1},{d:2,july:2},{d:3,july:3},{d:4,july:4} ],
+    [ {d:5,july:5},{d:6,july:6},{d:7,july:7},{d:8,july:8},{d:9,july:9},{d:10,july:10},{d:11,july:11} ],
+    [ {d:12,july:12},{d:13,july:13},{d:14,july:14},{d:15,july:15},{d:16,july:16},{d:17,july:17},{d:18,july:18} ],
+    [ {d:19,july:19},{d:20,july:20},{d:21,july:21},{d:22,july:22},{d:23,july:23},{d:24,july:24},{d:25,july:25} ],
+    [ {d:26,july:26},{d:27,july:27},{d:28,july:28},{d:29,july:29},{d:30,july:30},{d:31,july:31},{d:1} ]
+  ];
+  let TODAY = 19;
+  let MAX_SLIVERS = 2;
+  let FACE_COLORS = ['#3B4EFF','#0496FF','#FF9F1C','#FF2E7E','#8B5CF6','#00A896'];
+  let NAMES = ['M','K','L','D','J','T'];
+
+  let grid = document.getElementById('grid');
+  let selected = TODAY;
+
+  WEEKS.forEach(function(week){
+    let row = document.createElement('div');
+    row.className = 'week';
+    let weekDays = week.map(function(c){ return c.july || null; });
+    let lane = false;
+    SPANS.forEach(function(s){
+      let cols = [];
+      weekDays.forEach(function(j, idx){ if(j && j >= s.start && j <= s.end) cols.push(idx); });
+      if(!cols.length) return;
+      lane = true;
+      let first = cols[0], last = cols[cols.length-1];
+      let bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.style.background = CAT[s.cat].color;
+      bar.style.left = 'calc(' + first + ' * 100% / 7 + 2px)';
+      bar.style.width = 'calc(' + (last-first+1) + ' * 100% / 7 - 4px)';
+      bar.textContent = s.title;
+      if(weekDays[first] > s.start) bar.classList.add('cont-left');
+      if(weekDays[last] < s.end) bar.classList.add('cont-right');
+      row.appendChild(bar);
+    });
+    if(lane) row.classList.add('has-lane');
+
+    week.forEach(function(c){
+      let cell = document.createElement('div');
+      cell.className = 'cell' + (c.july ? '' : ' dim') + (c.july === TODAY ? ' today' : '');
+      if(c.july === selected) cell.classList.add('selected');
+      let dn = document.createElement('div');
+      dn.className = 'datenum';
+      dn.innerHTML = (c.july === TODAY) ? '<b>' + c.d + '</b>' : c.d;
+      cell.appendChild(dn);
+
+      let stack = document.createElement('div');
+      stack.className = 'ev-stack';
+      if(c.july && EVENTS[c.july]){
+        let evs = EVENTS[c.july];
+        evs.slice(0, MAX_SLIVERS).forEach(function(e){
+          let el = document.createElement('div');
+          el.className = 'ev';
+          el.style.background = CAT[e.cat].color;
+          el.textContent = e.t;
+          stack.appendChild(el);
+        });
+        if(evs.length > MAX_SLIVERS){
+          let m = document.createElement('div');
+          m.className = 'more';
+          m.textContent = '+' + (evs.length - MAX_SLIVERS) + ' more';
+          stack.appendChild(m);
+        }
+      }
+      cell.appendChild(stack);
+
+      if(c.july){
+        cell.addEventListener('click', function(){
+          selected = c.july;
+          document.querySelectorAll('.cell.selected').forEach(function(x){ x.classList.remove('selected'); });
+          cell.classList.add('selected');
+          renderDetail();
+        });
+      }
+      row.appendChild(cell);
+    });
+    grid.appendChild(row);
+  });
+
+  function dayEvents(j){
+    let out = (EVENTS[j] || []).slice();
+    SPANS.forEach(function(s){
+      if(j >= s.start && j <= s.end){
+        out.unshift({t:s.title + ' (Day ' + (j - s.start + 1) + ')', cat:s.cat, time:'All day', loc:'', going:5, maybe:1, comments:9});
+      }
+    });
+    return out;
+  }
+
+  function renderDetail(){
+    let dowNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    let dow = dowNames[(3 + selected - 1) % 7];
+    document.getElementById('detail-title').textContent = dow + ', July ' + selected;
+    let body = document.getElementById('detail-body');
+    body.innerHTML = '';
+    let evs = dayEvents(selected);
+    if(!evs.length){
+      body.innerHTML = '<div style="color:var(--ink-soft);font-size:13px;padding:6px 0 2px">Nothing planned — someone should fix that. ✌️</div>';
+      return;
+    }
+    evs.forEach(function(e){
+      let card = document.createElement('div');
+      card.className = 'card';
+      let faces = '';
+      for(let i = 0; i < Math.min(e.going, 4); i++){
+        faces += '<div class="face" style="background:' + FACE_COLORS[i] + '">' + NAMES[i] + '</div>';
+      }
+      card.innerHTML =
+        '<div class="stripe" style="background:' + CAT[e.cat].color + '"></div>' +
+        '<div style="flex:1">' +
+          '<div class="t">' + e.t + '</div>' +
+          '<div class="m">' + e.time + (e.loc ? ' · ' + e.loc : '') + ' · 💬 ' + e.comments + '</div>' +
+          '<div class="rsvp">' +
+            '<div class="faces">' + faces + '</div>' +
+            '<div class="going">' + e.going + ' going · ' + e.maybe + ' maybe</div>' +
+            '<button class="pill">I\'m in</button>' +
+          '</div>' +
+        '</div>';
+      body.appendChild(card);
+    });
+  }
+  renderDetail();
+
+  document.getElementById('theme-toggle').addEventListener('click', function(){
+    let phone = document.getElementById('phone');
+    let dark = phone.getAttribute('data-theme') === 'dark';
+    phone.setAttribute('data-theme', dark ? 'light' : 'dark');
+    this.textContent = dark ? '🌙' : '☀️';
+  });
+</script>
+</body>
+</html>
