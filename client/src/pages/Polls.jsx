@@ -95,7 +95,7 @@ export default function Polls() {
                       </span>
                       {event.createdBy === user.id && (
                         <button
-                          className="btn-secondary"
+                          className="btn-primary"
                           style={{ padding: '6px 10px', fontSize: 11 }}
                           onClick={() => handleLock(event._id, opt._id)}
                         >
@@ -120,8 +120,8 @@ export default function Polls() {
         </div>
 
         <div style={{ display: 'flex', gap: 10, padding: '0 18px 18px' }}>
-          <Link className="btn-secondary" to="/">Calendar</Link>
-          <Link className="btn-secondary" to="/group">Group</Link>
+          <Link className="btn-primary" to="/">Calendar</Link>
+          <Link className="btn-primary" to="/group">Group</Link>
         </div>
       </div>
     </div>
@@ -189,7 +189,7 @@ function PollForm({ groupId, categories, onCreated, onCancel }) {
         {dates.length < 3 && (
           <button
             type="button"
-            className="btn-secondary"
+            className="btn-primary"
             style={{ marginTop: 8, padding: '6px 12px', fontSize: 12 }}
             onClick={() => setDates([...dates, ''])}
           >

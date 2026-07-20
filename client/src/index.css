@@ -72,6 +72,8 @@ button, input { font-family: inherit; }
   font-size: 14px;
   font-weight: 900;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
   box-shadow: 0 3px 8px rgba(59, 78, 255, .35);
 }
 .btn-primary:disabled { opacity: .6; cursor: default; }
@@ -85,6 +87,8 @@ button, input { font-family: inherit; }
   font-size: 14px;
   font-weight: 800;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .auth-page {

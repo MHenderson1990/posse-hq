@@ -141,7 +141,7 @@ export default function Calendar() {
         <div className="detail">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <h3 style={{ margin: 0 }}>{formatLongDate(selectedIso)}</h3>
-            <button className="btn-secondary" style={{ padding: '6px 12px', fontSize: 12 }} onClick={() => setFormState('new')}>
+            <button className="btn-primary" style={{ padding: '6px 12px', fontSize: 12 }} onClick={() => setFormState('new')}>
               + New event
             </button>
           </div>
@@ -166,9 +166,9 @@ export default function Calendar() {
         </div>
 
         <div style={{ display: 'flex', gap: 10, padding: '0 18px 18px' }}>
-          <Link className="btn-secondary" to="/group">Group</Link>
-          <Link className="btn-secondary" to="/polls">Polls</Link>
-          <Link className="btn-secondary" to="/settings">Settings</Link>
+          <Link className="btn-primary" to="/group">Group</Link>
+          <Link className="btn-primary" to="/polls">Polls</Link>
+          <Link className="btn-primary" to="/settings">Settings</Link>
         </div>
       </div>
 

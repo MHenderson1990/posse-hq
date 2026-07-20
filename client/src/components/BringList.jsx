@@ -70,7 +70,7 @@ export default function BringList({ groupId, eventId, currentUserId }) {
           onChange={(e) => setLabel(e.target.value)}
           required
         />
-        <button className="btn-secondary" type="submit" style={{ padding: '8px 14px' }}>
+        <button className="btn-primary" type="submit" style={{ padding: '8px 14px' }}>
           Add
         </button>
       </form>

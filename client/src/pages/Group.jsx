@@ -86,7 +86,7 @@ export default function Group() {
               <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: 4, color: 'var(--ink)' }}>
                 {group.inviteCode}
               </div>
-              <button className="btn-secondary" style={{ marginTop: 10 }} onClick={copyInviteCode}>
+              <button className="btn-primary" style={{ marginTop: 10 }} onClick={copyInviteCode}>
                 {copied ? 'Copied!' : 'Copy invite code'}
               </button>
             </div>
@@ -133,7 +133,7 @@ export default function Group() {
                   onChange={(e) => setNewCatColor(e.target.value)}
                   style={{ width: 36, height: 36, border: 'none', borderRadius: 8, padding: 0, background: 'none' }}
                 />
-                <button className="btn-secondary" type="submit" style={{ padding: '8px 14px' }}>Add</button>
+                <button className="btn-primary" type="submit" style={{ padding: '8px 14px' }}>Add</button>
               </form>
               {catError && <div className="error-text" style={{ marginTop: 6 }}>{catError}</div>}
             </div>

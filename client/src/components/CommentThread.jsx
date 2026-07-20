@@ -62,7 +62,7 @@ export default function CommentThread({ groupId, eventId, currentUserId, onCount
           onChange={(e) => setText(e.target.value)}
           required
         />
-        <button className="btn-secondary" type="submit" style={{ padding: '8px 14px' }}>
+        <button className="btn-primary" type="submit" style={{ padding: '8px 14px' }}>
           Post
         </button>
       </form>
