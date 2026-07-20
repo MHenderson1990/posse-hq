@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createEvent, updateEvent, deleteEvent } from '../api/events';
 import { useAuth } from '../context/AuthContext';
+import { formatTime12h } from '../utils/calendar';
 import CommentThread from './CommentThread';
 import BringList from './BringList';
 
@@ -84,8 +85,8 @@ export default function EventForm({ groupId, categories, initialEvent, defaultDa
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink)' }}>
                 {startDate === endDate ? formatDateShort(startDate) : `${formatDateShort(startDate)} – ${formatDateShort(endDate)}`}
-                {startTime && ` · ${startTime}`}
-                {endTime && `–${endTime}`}
+                {[startTime, endTime].filter(Boolean).length > 0 &&
+                  ` · ${[startTime, endTime].filter(Boolean).map(formatTime12h).join('–')}`}
               </div>
               {location && <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginTop: 2 }}>{location}</div>}
             </div>

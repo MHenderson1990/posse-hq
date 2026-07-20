@@ -34,6 +34,13 @@ export function formatLongDate(iso) {
   return `${weekdayLong(iso)}, ${MONTH_NAMES[m - 1]} ${d}`;
 }
 
+export function formatTime12h(time24) {
+  let [h, m] = time24.split(':').map(Number);
+  let period = h >= 12 ? 'PM' : 'AM';
+  let h12 = h % 12 || 12;
+  return `${h12}:${pad2(m)} ${period}`;
+}
+
 export function dowHeaders() {
   return DOW_NAMES;
 }
