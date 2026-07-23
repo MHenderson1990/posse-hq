@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Capacitor } from '@capacitor/core';
 import { useAuth } from '../context/AuthContext';
 import { useGroup } from '../context/GroupContext';
 import { listCategories } from '../api/categories';
 import { listPolls, createPoll, voteOnPoll, lockPoll, cancelPoll } from '../api/polls';
 import { listChoicePolls, createChoicePoll, voteOnChoicePoll, lockChoicePoll, deleteChoicePoll } from '../api/choicePolls';
+import { isBusyOnDate } from '../availability';
 
 export default function Polls() {
   let { user } = useAuth();
@@ -13,12 +15,21 @@ export default function Polls() {
   let [datePolls, setDatePolls] = useState([]);
   let [choicePolls, setChoicePolls] = useState([]);
   let [view, setView] = useState('closed'); // closed | chooser | date | choice
+  let [busyDates, setBusyDates] = useState({});
 
   useEffect(() => {
     listCategories(group._id).then((data) => setCategories(data.categories));
     listPolls(group._id).then((data) => setDatePolls(data.polls));
     listChoicePolls(group._id).then((data) => setChoicePolls(data.polls));
   }, [group._id]);
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    let dates = new Set();
+    datePolls.forEach((p) => p.options.forEach((o) => dates.add(o.candidateDate)));
+    Promise.all([...dates].map((d) => isBusyOnDate(d).then((busy) => [d, busy])))
+      .then((pairs) => setBusyDates((prev) => ({ ...prev, ...Object.fromEntries(pairs) })));
+  }, [datePolls]);
 
   async function handleVote(eventId, optionId) {
     let data = await voteOnPoll(group._id, eventId, optionId);
@@ -122,6 +133,7 @@ export default function Polls() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {options.map((opt) => {
                   let myVote = opt.votes.some((v) => v._id === user.id);
+                  let busy = busyDates[opt.candidateDate];
                   return (
                     <div key={opt._id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <button
@@ -132,6 +144,11 @@ export default function Polls() {
                       >
                         {opt.candidateDate}
                       </button>
+                      {busy !== undefined && (
+                        <span style={{ fontSize: 11, fontWeight: 800, color: busy ? 'var(--error)' : 'var(--success, #2a9d5c)', minWidth: 70 }}>
+                          {busy ? '⚠️ Busy' : '✓ Free'}
+                        </span>
+                      )}
                       <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--ink-soft)', minWidth: 60 }}>
                         {opt.votes.length} vote{opt.votes.length === 1 ? '' : 's'}
                       </span>
