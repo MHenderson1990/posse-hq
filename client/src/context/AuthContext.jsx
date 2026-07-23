@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { apiFetch, setToken, clearToken, getToken } from '../api/client';
+import { setupPushNotifications } from '../push';
 
 let AuthContext = createContext(null);
 
@@ -17,6 +18,10 @@ export function AuthProvider({ children }) {
       .catch(() => clearToken())
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (user) setupPushNotifications();
+  }, [user?.id]);
 
   async function register(name, email, password) {
     let data = await apiFetch('/auth/register', {

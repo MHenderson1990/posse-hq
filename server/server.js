@@ -14,6 +14,7 @@ let deviceRoutes = require('./routes/devices');
 let pollRoutes = require('./routes/polls');
 let choicePollRoutes = require('./routes/choicePolls');
 let bringItemRoutes = require('./routes/bringItems');
+let myRsvpsRoutes = require('./routes/myRsvps');
 let { sendUpcomingEventReminders } = require('./jobs/reminders');
 let { extendRecurringSeries } = require('./jobs/recurrence');
 
@@ -29,6 +30,7 @@ app.use('/api/groups/:groupId/categories', requireAuth, requireGroupMember, cate
 app.use('/api/groups/:groupId/events', requireAuth, requireGroupMember, eventRoutes);
 app.use('/api/groups/:groupId/polls', requireAuth, requireGroupMember, pollRoutes);
 app.use('/api/groups/:groupId/choice-polls', requireAuth, requireGroupMember, choicePollRoutes);
+app.use('/api/groups/:groupId/my-rsvps', requireAuth, requireGroupMember, myRsvpsRoutes);
 app.use('/api/groups/:groupId/events/:eventId/rsvps', requireAuth, requireGroupMember, rsvpRoutes);
 app.use('/api/groups/:groupId/events/:eventId/comments', requireAuth, requireGroupMember, commentRoutes);
 app.use('/api/groups/:groupId/events/:eventId/bring-items', requireAuth, requireGroupMember, bringItemRoutes);

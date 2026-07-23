@@ -2,9 +2,18 @@ node_modules/
 .env
 .env.*
 !.env.example
+!.env.production
+*.p8
 dist/
 client/dist/
-client/ios/
 www/
 .DS_Store
 *.log
+
+# iOS (Capacitor project itself is tracked; build artifacts are not)
+client/ios/App/Pods/
+client/ios/App/build/
+client/ios/App/DerivedData/
+client/ios/App/App/public/
+client/ios/**/*.xcuserstate
+client/ios/**/xcuserdata/

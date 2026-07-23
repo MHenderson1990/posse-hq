@@ -96,7 +96,7 @@ button, input { font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: calc(24px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
 }
 
 .auth-card {
@@ -142,7 +142,7 @@ button, input { font-family: inherit; }
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  padding: 32px 16px 64px;
+  padding: calc(32px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(64px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
 }
 
 .calendar-card {
@@ -270,7 +270,8 @@ button, input { font-family: inherit; }
 /* ---------- modal ---------- */
 .modal-backdrop {
   position: fixed; inset: 0; background: rgba(29, 20, 64, .45);
-  display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 100;
+  display: flex; align-items: center; justify-content: center; z-index: 100;
+  padding: calc(24px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
 }
 .modal-card {
   width: 100%; max-width: 380px; max-height: 90vh; overflow-y: auto;

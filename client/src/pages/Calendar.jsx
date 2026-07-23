@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { App as CapacitorApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import { useAuth } from '../context/AuthContext';
 import { useGroup } from '../context/GroupContext';
 import { useTheme } from '../context/ThemeContext';
@@ -8,6 +10,7 @@ import { listEvents } from '../api/events';
 import { listRsvps, setMyRsvp } from '../api/rsvps';
 import { listComments } from '../api/comments';
 import { getMonthWeeks, monthLabel, isoDateToday, formatLongDate, eventsForDay } from '../utils/calendar';
+import { syncEventKit } from '../eventkit';
 import CalendarGrid from '../components/CalendarGrid';
 import EventCard from '../components/EventCard';
 import EventForm from '../components/EventForm';
@@ -35,6 +38,13 @@ export default function Calendar() {
 
   useEffect(() => {
     listEvents(group._id).then((data) => setEvents(data.events));
+  }, [group._id]);
+
+  useEffect(() => {
+    syncEventKit(group._id);
+    if (!Capacitor.isNativePlatform()) return;
+    let listener = CapacitorApp.addListener('resume', () => syncEventKit(group._id));
+    return () => { listener.then((l) => l.remove()); };
   }, [group._id]);
 
   let categoriesById = useMemo(() => {
@@ -84,11 +94,13 @@ export default function Calendar() {
       });
     }
     setFormState(null);
+    syncEventKit(group._id);
   }
 
   function handleDeleted(eventId) {
     setEvents((prev) => prev.filter((e) => e._id !== eventId));
     setFormState(null);
+    syncEventKit(group._id);
   }
 
   async function handleSetRsvp(eventId, status) {
@@ -98,6 +110,7 @@ export default function Calendar() {
       let others = existing.filter((r) => r.userId._id !== user.id);
       return { ...prev, [eventId]: [...others, data.rsvp] };
     });
+    syncEventKit(group._id);
   }
 
   function handleCommentCountChange(eventId, count) {
