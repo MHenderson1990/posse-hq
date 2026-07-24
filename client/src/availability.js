@@ -8,23 +8,29 @@ async function ensureReadAccess() {
   return requested.result === 'granted';
 }
 
-// Checks the device calendar for a conflict on the given day. Only ever reads
-// start/end timestamps to compute a yes/no answer, on-device - event titles,
-// locations, and other details are never touched, stored, or sent anywhere.
-export async function isBusyOnDate(dateStr) {
-  if (!Capacitor.isNativePlatform()) return false;
+// Reads the device calendar for the given day and returns only start/end
+// timestamps, on-device. Event titles, locations, and other details are
+// never touched, stored, or sent anywhere - only these blocks may be
+// reported to the server to compute group-wide free/busy.
+export async function getBusyBlocks(dateStr) {
+  if (!Capacitor.isNativePlatform()) return [];
 
   try {
     let granted = await ensureReadAccess();
-    if (!granted) return false;
+    if (!granted) return [];
 
     let [y, m, d] = dateStr.split('-').map(Number);
     let from = new Date(y, m - 1, d).getTime();
     let to = from + 24 * 60 * 60 * 1000;
 
     let { result } = await CapacitorCalendar.listEventsInRange({ from, to });
-    return result.length > 0;
+    return result.map((e) => ({ start: e.startDate, end: e.endDate }));
   } catch {
-    return false;
+    return [];
   }
+}
+
+export async function isBusyOnDate(dateStr) {
+  let blocks = await getBusyBlocks(dateStr);
+  return blocks.length > 0;
 }

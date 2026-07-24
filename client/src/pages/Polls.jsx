@@ -6,7 +6,8 @@ import { useGroup } from '../context/GroupContext';
 import { listCategories } from '../api/categories';
 import { listPolls, createPoll, voteOnPoll, lockPoll, cancelPoll } from '../api/polls';
 import { listChoicePolls, createChoicePoll, voteOnChoicePoll, lockChoicePoll, deleteChoicePoll } from '../api/choicePolls';
-import { isBusyOnDate } from '../availability';
+import { getBusyBlocks } from '../availability';
+import { pushFreeBusy, listFreeBusy } from '../api/freeBusy';
 
 export default function Polls() {
   let { user } = useAuth();
@@ -16,6 +17,7 @@ export default function Polls() {
   let [choicePolls, setChoicePolls] = useState([]);
   let [view, setView] = useState('closed'); // closed | chooser | date | choice
   let [busyDates, setBusyDates] = useState({});
+  let [groupFreeBusy, setGroupFreeBusy] = useState({});
 
   useEffect(() => {
     listCategories(group._id).then((data) => setCategories(data.categories));
@@ -25,11 +27,25 @@ export default function Polls() {
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
-    let dates = new Set();
-    datePolls.forEach((p) => p.options.forEach((o) => dates.add(o.candidateDate)));
-    Promise.all([...dates].map((d) => isBusyOnDate(d).then((busy) => [d, busy])))
-      .then((pairs) => setBusyDates((prev) => ({ ...prev, ...Object.fromEntries(pairs) })));
-  }, [datePolls]);
+    let dates = [...new Set(datePolls.flatMap((p) => p.options.map((o) => o.candidateDate)))];
+    if (!dates.length) return;
+
+    Promise.all(dates.map((date) => getBusyBlocks(date).then((busyBlocks) => ({ date, busyBlocks }))))
+      .then((entries) => {
+        setBusyDates((prev) => ({
+          ...prev,
+          ...Object.fromEntries(entries.map((e) => [e.date, e.busyBlocks.length > 0])),
+        }));
+        return pushFreeBusy(group._id, entries);
+      })
+      .then(() => listFreeBusy(group._id, dates))
+      .then((data) => {
+        let byDate = {};
+        data.freeBusy.forEach((fb) => { byDate[fb.date] = fb; });
+        setGroupFreeBusy((prev) => ({ ...prev, ...byDate }));
+      })
+      .catch(() => {});
+  }, [datePolls, group._id]);
 
   async function handleVote(eventId, optionId) {
     let data = await voteOnPoll(group._id, eventId, optionId);
@@ -134,6 +150,7 @@ export default function Polls() {
                 {options.map((opt) => {
                   let myVote = opt.votes.some((v) => v._id === user.id);
                   let busy = busyDates[opt.candidateDate];
+                  let fb = groupFreeBusy[opt.candidateDate];
                   return (
                     <div key={opt._id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <button
@@ -145,8 +162,13 @@ export default function Polls() {
                         {opt.candidateDate}
                       </button>
                       {busy !== undefined && (
-                        <span style={{ fontSize: 11, fontWeight: 800, color: busy ? 'var(--error)' : 'var(--success, #2a9d5c)', minWidth: 70 }}>
-                          {busy ? '⚠️ Busy' : '✓ Free'}
+                        <span title={busy ? "You're busy" : "You're free"} style={{ fontSize: 13 }}>
+                          {busy ? '⚠️' : '✓'}
+                        </span>
+                      )}
+                      {fb && (
+                        <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--ink-soft)', minWidth: 56 }}>
+                          {fb.totalMembers - fb.busyUserIds.length}/{fb.totalMembers} free
                         </span>
                       )}
                       <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--ink-soft)', minWidth: 60 }}>
